@@ -1,0 +1,42 @@
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "email": "derek@email.com",
+  "password": "password1234",
+  "role":"ADMIN"
+} 
+
+
+###
+POST http://localhost:3000/login/
+Content-Type: application/json
+
+{
+  "email": "derek@email.com",
+  "password": "password1234"
+} 
+
+
+###
+POST http://localhost:3000/reservations/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NjcwODQ2MzN9.vqE1-FQGCVjakLxyiHH1-T1-NpRV2PDcIw5fUvP4Q5o
+
+{
+    "date": "01-01-2026",
+    "time_slot": "19:00",
+    "guests": 4
+}
+
+###
+GET http://localhost:3000/reservations/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2NzA4ODI1MH0.FYpswxq9RctPWJLEfEdy_6I3PDpwnNF2pW1JU-Xrnyo
+
+###
+GET http://localhost:3000/admin/reservations?date=2025-01-10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjcwODg4NjZ9.49QuqaBt_MHoGkb2qjSHL18s46p6dNQdGPr_PQbK_-o
+
+###
+DELETE http://localhost:3000/reservations/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NjcwODg4NjZ9.49QuqaBt_MHoGkb2qjSHL18s46p6dNQdGPr_PQbK_-o
