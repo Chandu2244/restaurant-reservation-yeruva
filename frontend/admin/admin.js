@@ -57,7 +57,7 @@ async function fetchReservations() {
 
   data.forEach(r => {
     const tr = document.createElement("tr");
-    tr.setAttribute("data-id", r.id);
+    tr.id = `row-${r.id}`; 
     tr.innerHTML = `
       <td>${r.email}</td>
       <td>${r.date}</td>
@@ -85,12 +85,13 @@ async function fetchReservations() {
 
 function enableEdit(id) {
   const row = document.getElementById(`row-${id}`);
-  const date = row.children[1].innerText;
-  const time = row.children[2].innerText;
-  const guests = row.children[3].innerText;
+
+  const date = row.children[1].textContent.trim();
+  const time = row.children[2].textContent.trim();
+  const guests = row.children[3].textContent.trim();
 
   row.children[1].innerHTML = `<input type="date" value="${date}" />`;
-  row.children[2].innerHTML = `<input type="text" value="${time}" />`;
+  row.children[2].innerHTML = `<select>${getTimeSlotOptions(time)}</select>`;
   row.children[3].innerHTML = `<input type="number" value="${guests}" />`;
 
   row.children[5].innerHTML = `
@@ -107,10 +108,10 @@ async function saveEdit(id) {
   const row = document.getElementById(`row-${id}`);
 
   const date = row.children[1].querySelector("input").value;
-  const time_slot = row.children[2].querySelector("input").value;
+  const time_slot = row.children[2].querySelector("select").value;
   const guests = row.children[3].querySelector("input").value;
 
-  await fetch(`${API_BASE}/admin/reservations/${id}`, {
+  const response= await fetch(`${API_BASE}/admin/reservations/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -119,7 +120,28 @@ async function saveEdit(id) {
     body: JSON.stringify({ date, time_slot, guests })
   });
 
+  const text = await response.text();
+
+  // 🔴 HANDLE ERROR FROM BACKEND
+  if (!response.ok) {
+    alert(text);     // shows "Guests exceed table capacity"
+    return;
+  }
+
   fetchReservations(); // refresh table
+}
+
+function getTimeSlotOptions(selectedTime) {
+  let options = "";
+  for (let i = 0; i < 24; i++) {
+    const hour = i.toString().padStart(2, "0") + ":00";
+    options += `
+      <option value="${hour}" ${hour === selectedTime ? "selected" : ""}>
+        ${hour}
+      </option>
+    `;
+  }
+  return options;
 }
 
 async function cancelReservation(id) {
