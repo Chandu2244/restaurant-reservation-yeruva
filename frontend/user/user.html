@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>User Dashboard</title>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <link rel="stylesheet" href="user.css" />
+</head>
+<body>
+
+<header>
+  <h2>User Dashboard</h2>
+  <button id="logoutBtn">Logout</button>
+</header>
+
+<section class="card">
+  <h3>Create Reservation</h3>
+
+  <div class="form-row">
+    <input type="date" id="date" />
+    <input type="text" id="timeSlot" placeholder="18:00-20:00" />
+    <input type="number" id="guests" placeholder="Guests" />
+    <button id="bookBtn">Book</button>
+  </div>
+
+  <p id="message"></p>
+</section>
+
+<section class="card">
+  <h3>My Reservations</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time Slot</th>
+        <th>Guests</th>
+        <th>Table</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="reservationsBody">
+      <tr>
+        <td>2025-01-20</td>
+        <td>18:00-20:00</td>
+        <td>4</td>
+        <td>3</td>
+        <td>
+        <button class="text-cancel-btn">Cancel</button>
+        </td>
+    </tr>
+    </tbody>
+    
+
+  </table>
+</section>
+
+<script src="user.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+/* Global */
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background-color: #f5f6f8; /* light grey background */
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* Header */
+header {
+  background-color: #ffffff;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+header h2 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+header button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+}
+
+header button:hover {
+  background-color: #c0392b;
+}
+
+/* Filter section */
+.filter {
+  background-color: #ffffff;
+  margin: 20px;
+  padding: 15px;
+  border-radius: 6px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.filter input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.filter button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.filter button:hover {
+  background-color: #2980b9;
+}
+
+/* Table container */
+section {
+  margin: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+thead {
+  background-color: #ecf0f1;
+}
+
+th {
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #ddd;
+}
+
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+/* Zebra rows */
+tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Hover effect */
+tbody tr:hover {
+  background-color: #f1f7ff;
+}
+
+/* Action buttons */
+td button {
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.update-btn:hover {
+  background-color: #fff4d6;
+  transform: scale(1.05);
+}
+/* Empty message */
+td[colspan] {
+  padding: 20px;
+  color: #777;
+  font-style: italic;
+}
+.action-cell {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+/* Common icon button */
+.icon-btn {
+  border: none;
+  background: transparent;   /* NO background */
+  cursor: pointer;
+  font-size: 16px;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+/* Update – Gold / Yellow */
+.update-btn {
+  color: #d4a017; /* rich gold */
+}
+
+
+
+/* Delete – Red */
+.delete-btn {
+  color: #e74c3c;
+}
+
+.delete-btn:hover {
+  background-color: #f9d3cf;
+  transform: scale(1.05);
+}
+

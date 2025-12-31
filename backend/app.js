@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
+app.use(cors());
 app.use(express.json());
 const path = require("path");
 
@@ -8,7 +10,7 @@ const sqlite3 = require("sqlite3");
 
 
 const bcrypt = require("bcrypt");
-const cors = require("cors");
+
 const jwt = require("jsonwebtoken");
 
 const dbPath = path.join(__dirname, "database.db");
