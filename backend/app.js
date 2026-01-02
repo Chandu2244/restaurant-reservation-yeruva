@@ -4,17 +4,15 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 const path = require("path");
+require("dotenv").config();
 
 const { open } = require("sqlite");
 const sqlite3 = require("sqlite3");
 
-
 const bcrypt = require("bcrypt");
-
 const jwt = require("jsonwebtoken");
 
 const dbPath = path.join(__dirname, "database.db");
-
 let db = null;
 
 const initializeDBAndServer = async () => {
@@ -49,7 +47,7 @@ const authenticateToken = (request, response, next) => {
     response.status(401);
     response.send("Invalid JWT Token");
   } else {
-    jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, payload) => {
+    jwt.verify(jwtToken, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
         response.status(401);
         response.send("Invalid JWT Token");
@@ -124,7 +122,7 @@ app.post("/login", async (request, response) => {
         role: dbUser.role
       };
 
-      const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+      const jwtToken = jwt.sign(payload,process.env.JWT_SECRET);
       response.send({ jwtToken });
     } else {
       response.status(400);
