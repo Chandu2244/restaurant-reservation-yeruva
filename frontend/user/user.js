@@ -1,7 +1,7 @@
 /* =========================
    Constants & DOM Elements
 ========================= */
-const API_BASE = "http://localhost:3000";
+const API_BASE = "https://restaurant-reservation-yeruva.onrender.com";
 
 const logoutBtn = document.getElementById("logoutBtn");
 const dateInput = document.getElementById("date");

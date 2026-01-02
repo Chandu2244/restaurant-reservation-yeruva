@@ -36,6 +36,13 @@ const initializeDBAndServer = async () => {
 
 initializeDBAndServer();
 
+//test
+app.get("/", (request, response) => {
+  response.send("Restaurant Reservation API is running 🚀");
+});
+
+
+
 //Authentication Token middleware 
 const authenticateToken = (request, response, next) => {
   let jwtToken;
