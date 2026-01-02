@@ -1,11 +1,20 @@
+/* =========================
+   Constants & Config
+========================= */
 const API_BASE = "http://localhost:3000";
 const token = localStorage.getItem("token");
 
+/* =========================
+   DOM Elements
+========================= */
 const searchBtn = document.getElementById("searchBtn");
 const dateInput = document.getElementById("dateFilter");
 const tableBody = document.getElementById("reservationsBody");
-logoutBtn = document.getElementById("logoutBtn");   
+const logoutBtn = document.getElementById("logoutBtn");
 
+/* =========================
+   Logout Handler
+========================= */
 logoutBtn.onclick = () => {
   const confirmLogout = confirm("Are you sure you want to logout?");
 
@@ -13,18 +22,24 @@ logoutBtn.onclick = () => {
     localStorage.removeItem("token");
     window.location.href = "../login/login.html";
   }
-  // if No → stay on same page (do nothing)
+  // If "No" → stay on the same page
 };
 
-
-
+/* =========================
+   Search / Filter Handler
+========================= */
 searchBtn.onclick = fetchReservations;
 
+/* =========================
+   Fetch Reservations (GET)
+========================= */
 async function fetchReservations() {
+  // Clear existing rows
   tableBody.innerHTML = "";
 
   let url = `${API_BASE}/admin/reservations`;
 
+  // Apply date filter if selected
   const selectedDate = dateInput.value.trim();
   if (selectedDate) {
     url += `?date=${selectedDate}`;
@@ -36,16 +51,17 @@ async function fetchReservations() {
     }
   });
 
+  // Read response as text (can be JSON or message)
   const text = await response.text();
 
   let data;
   try {
     data = JSON.parse(text);
   } catch {
-    data = text;
+    data = text; // backend sent plain message
   }
 
-
+  // If backend sends message instead of array
   if (typeof data === "string") {
     tableBody.innerHTML = `
       <tr>
@@ -55,9 +71,11 @@ async function fetchReservations() {
     return;
   }
 
-  data.forEach(r => {
+  // Render reservations
+  data.forEach((r) => {
     const tr = document.createElement("tr");
-    tr.id = `row-${r.id}`; 
+    tr.id = `row-${r.id}`;
+
     tr.innerHTML = `
       <td>${r.email}</td>
       <td>${r.date}</td>
@@ -65,24 +83,28 @@ async function fetchReservations() {
       <td>${r.guests}</td>
       <td>${r.table_number}</td>
       <td class="action-cell">
-      ${
-        r.status === "CANCELLED"
-        ? "Cancelled"
-        : `
-            <button class="icon-btn update-btn" onclick="enableEdit(${r.id})" title="Update">
-            <i class="fa-solid fa-pen-to-square"></i>
-            </button>
-            <button class="icon-btn delete-btn" onclick="cancelReservation(${r.id})" title="Cancel">
-            <i class="fa-solid fa-trash"></i>
-            </button>
-        `
+        ${
+          r.status === "CANCELLED"
+            ? "Cancelled"
+            : `
+              <button class="icon-btn update-btn" onclick="enableEdit(${r.id})" title="Update">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="icon-btn delete-btn" onclick="cancelReservation(${r.id})" title="Cancel">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            `
         }
-        </td>
+      </td>
     `;
+
     tableBody.appendChild(tr);
   });
 }
 
+/* =========================
+   Enable Inline Edit
+========================= */
 function enableEdit(id) {
   const row = document.getElementById(`row-${id}`);
 
@@ -90,10 +112,38 @@ function enableEdit(id) {
   const time = row.children[2].textContent.trim();
   const guests = row.children[3].textContent.trim();
 
+  // Replace cells with inputs
   row.children[1].innerHTML = `<input type="date" value="${date}" />`;
   row.children[2].innerHTML = `<select>${getTimeSlotOptions(time)}</select>`;
   row.children[3].innerHTML = `<input type="number" value="${guests}" />`;
+  const guestsInput = row.children[3].querySelector("input");
 
+  // 1–12 only, max 2 digits, strict
+  guestsInput.addEventListener("keydown", (e) => {
+    const value = guestsInput.value;
+
+    // Allow backspace & delete
+    if (e.key === "Backspace" || e.key === "Delete") return;
+
+    // Block more than 2 digits
+    if (value.length >= 2) {
+      e.preventDefault();
+      return;
+    }
+
+    // Allow 1–9 when empty
+    if (value === "" && /^[1-9]$/.test(e.key)) return;
+
+    // Allow 10, 11, 12 only
+    if (value === "1" && (e.key === "0" || e.key === "1" || e.key === "2")) {
+      return;
+    }
+
+    // Block everything else
+    e.preventDefault();
+  });
+
+  // Replace action buttons
   row.children[5].innerHTML = `
     <button class="icon-btn update-btn" onclick="saveEdit(${id})">
       <i class="fa-solid fa-check"></i>
@@ -104,6 +154,9 @@ function enableEdit(id) {
   `;
 }
 
+/* =========================
+   Save Updated Reservation (PUT)
+========================= */
 async function saveEdit(id) {
   const row = document.getElementById(`row-${id}`);
 
@@ -111,7 +164,7 @@ async function saveEdit(id) {
   const time_slot = row.children[2].querySelector("select").value;
   const guests = row.children[3].querySelector("input").value;
 
-  const response= await fetch(`${API_BASE}/admin/reservations/${id}`, {
+  const response = await fetch(`${API_BASE}/admin/reservations/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -122,17 +175,21 @@ async function saveEdit(id) {
 
   const text = await response.text();
 
-  // 🔴 HANDLE ERROR FROM BACKEND
+  // Handle backend validation errors
   if (!response.ok) {
-    alert(text);     // shows "Guests exceed table capacity"
+    alert(text); // e.g. "Guests exceed table capacity"
     return;
   }
 
   fetchReservations(); // refresh table
 }
 
+/* =========================
+   Time Slot Options Generator
+========================= */
 function getTimeSlotOptions(selectedTime) {
   let options = "";
+
   for (let i = 0; i < 24; i++) {
     const hour = i.toString().padStart(2, "0") + ":00";
     options += `
@@ -141,9 +198,13 @@ function getTimeSlotOptions(selectedTime) {
       </option>
     `;
   }
+
   return options;
 }
 
+/* =========================
+   Cancel Reservation (DELETE)
+========================= */
 async function cancelReservation(id) {
   const confirmCancel = confirm("Cancel this reservation?");
   if (!confirmCancel) return;
@@ -158,5 +219,7 @@ async function cancelReservation(id) {
   fetchReservations(); // refresh table
 }
 
-// Load on page load
+/* =========================
+   Initial Load
+========================= */
 fetchReservations();

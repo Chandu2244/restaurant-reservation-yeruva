@@ -1,20 +1,23 @@
-let myFormEl = document.getElementById("myForm");
+/* =========================
+   Form Elements
+========================= */
+const myFormEl = document.getElementById("myForm");
 
-let passwordEl = document.getElementById("password");
-let passwordErrMsgEl = document.getElementById("passwordErrMsg");
+const emailEl = document.getElementById("email");
+const emailErrMsgEl = document.getElementById("emailErrMsg");
 
-let emailEl = document.getElementById("email");
-let emailErrMsgEl = document.getElementById("emailErrMsg");
+const passwordEl = document.getElementById("password");
+const passwordErrMsgEl = document.getElementById("passwordErrMsg");
 
-passwordEl.addEventListener("blur", function(event) {
-  if (event.target.value === "") {
-    passwordErrMsgEl.textContent = "Required*";
-  } else {
-    passwordErrMsgEl.textContent = "";
-  }
-});
+const loginBtn = document.getElementById("loginBtn");
+const errorMsg = document.getElementById("errorMsg");
 
-emailEl.addEventListener("blur", function(event) {
+/* =========================
+   Input Field Validation
+========================= */
+
+// Email validation on blur
+emailEl.addEventListener("blur", function (event) {
   if (event.target.value === "") {
     emailErrMsgEl.textContent = "Required*";
   } else {
@@ -22,26 +25,42 @@ emailEl.addEventListener("blur", function(event) {
   }
 });
 
-myFormEl.addEventListener("submit", function(event) {
+// Password validation on blur
+passwordEl.addEventListener("blur", function (event) {
+  if (event.target.value === "") {
+    passwordErrMsgEl.textContent = "Required*";
+  } else {
+    passwordErrMsgEl.textContent = "";
+  }
+});
+
+/* =========================
+   Prevent Default Form Submit
+========================= */
+myFormEl.addEventListener("submit", function (event) {
   event.preventDefault();
 });
 
+/* =========================
+   API Configuration
+========================= */
 const API_BASE = "http://localhost:3000";
 
-const loginBtn = document.getElementById("loginBtn");
-const errorMsg = document.getElementById("errorMsg");
-
+/* =========================
+   Login Handler
+========================= */
 loginBtn.onclick = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = emailEl.value.trim();
+  const password = passwordEl.value.trim();
 
+  // Basic validation before API call
   if (!email || !password) {
     errorMsg.innerText = "Please enter email and password";
     return;
   }
 
-  
   try {
+    // API request
     const response = await fetch(`${API_BASE}/login`, {
       method: "POST",
       headers: {
@@ -50,23 +69,33 @@ loginBtn.onclick = async () => {
       body: JSON.stringify({ email, password })
     });
 
-    const data = await response.json();
-    console.log(data);
+    // Read response as text (handles both success & error)
+    const text = await response.text();
 
+    // Handle login error
     if (!response.ok) {
-      errorMsg.innerText = data;
+      errorMsg.innerText = text;
       return;
     }
 
-    // 1️⃣ Store token
+    // Parse successful response
+    const data = JSON.parse(text);
+
+    /* =========================
+       Token Handling
+    ========================= */
+
+    // Store JWT token
     const token = data.jwtToken;
     localStorage.setItem("token", token);
 
-    // 2️⃣ Decode token to get role
+    // Decode token to get role
     const payload = JSON.parse(atob(token.split(".")[1]));
     const role = payload.role;
 
-    // 3️⃣ Redirect based on role
+    /* =========================
+       Role-based Redirection
+    ========================= */
     if (role === "ADMIN") {
       window.location.href = "../admin/admin.html";
     } else {
@@ -74,6 +103,7 @@ loginBtn.onclick = async () => {
     }
 
   } catch (error) {
+    // Server or network error
     errorMsg.innerText = "Server error. Please try again.";
   }
 };

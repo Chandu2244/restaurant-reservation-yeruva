@@ -24,8 +24,8 @@
 
   <div class="form-row">
     <input type="date" id="date" />
-    <input type="text" id="timeSlot" placeholder="18:00-20:00" />
-    <input type="number" id="guests" placeholder="Guests" />
+    <select id="timeSlot"></select>
+    <input type="number" min="1" max="12" maxlength="2" id="guests" placeholder="Guests" />
     <button id="bookBtn">Book</button>
   </div>
 
@@ -34,7 +34,6 @@
 
 <section class="card">
   <h3>My Reservations</h3>
-
   <table>
     <thead>
       <tr>
@@ -46,18 +45,7 @@
       </tr>
     </thead>
     <tbody id="reservationsBody">
-      <tr>
-        <td>2025-01-20</td>
-        <td>18:00-20:00</td>
-        <td>4</td>
-        <td>3</td>
-        <td>
-        <button class="text-cancel-btn">Cancel</button>
-        </td>
-    </tr>
     </tbody>
-    
-
   </table>
 </section>
 

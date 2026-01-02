@@ -1,3 +1,8 @@
+/* =========================
+   Constants & DOM Elements
+========================= */
+const API_BASE = "http://localhost:3000";
+
 const logoutBtn = document.getElementById("logoutBtn");
 const dateInput = document.getElementById("date");
 const timeSlotInput = document.getElementById("timeSlot");
@@ -5,21 +10,26 @@ const guestsInput = document.getElementById("guests");
 const bookBtn = document.getElementById("bookBtn");
 const reservationsBody = document.getElementById("reservationsBody");
 
+/* =========================
+   Utility
+========================= */
+function getToken() {
+  return localStorage.getItem("token");
+}
 
-
+/* =========================
+   Logout
+========================= */
 logoutBtn.onclick = () => {
-  const confirmLogout = confirm("Are you sure you want to logout?");
-
-  if (confirmLogout) {
+  if (confirm("Are you sure you want to logout?")) {
     localStorage.removeItem("token");
     window.location.href = "../login/login.html";
   }
-  // if No → stay on same page (do nothing)
 };
 
-
-
-//POST Fetch call
+/* =========================
+   Create Reservation (POST)
+========================= */
 bookBtn.onclick = async () => {
   const date = dateInput.value.trim();
   const time_slot = timeSlotInput.value.trim();
@@ -30,13 +40,11 @@ bookBtn.onclick = async () => {
     return;
   }
 
-  const token = localStorage.getItem("token");
-
-  const response = await fetch("http://localhost:3000/reservations", {
+  const response = await fetch(`${API_BASE}/reservations`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${getToken()}`
     },
     body: JSON.stringify({ date, time_slot, guests })
   });
@@ -45,17 +53,47 @@ bookBtn.onclick = async () => {
   alert(message);
 
   if (response.ok) {
-    fetchMyReservations(); // 🔁 refresh table
+    fetchMyReservations();
   }
 };
 
-//GET Fetch call
-async function fetchMyReservations() {
-  const token = localStorage.getItem("token");
 
-  const response = await fetch("http://localhost:3000/reservations/", {
+guestsInput.addEventListener("keydown", (e) => {
+  const value = guestsInput.value;
+
+  // Allow backspace & delete
+  if (e.key === "Backspace" || e.key === "Delete") return;
+
+  // Block more than 2 characters
+  if (value.length >= 2) {
+    e.preventDefault();
+    return;
+  }
+
+  // Allow 1–9 when empty
+  if (value === "" && /^[1-9]$/.test(e.key)) return;
+
+  // Allow 10, 11, 12 only
+  if (
+    value === "1" &&
+    (e.key === "0" || e.key === "1" || e.key === "2")
+  ) {
+    return;
+  }
+
+  // Block everything else
+  e.preventDefault();
+});
+
+/* =========================
+   Fetch + Render Reservations
+========================= */
+async function fetchMyReservations() {
+  reservationsBody.innerHTML = "";
+
+  const response = await fetch(`${API_BASE}/reservations`, {
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${getToken()}`
     }
   });
 
@@ -63,62 +101,66 @@ async function fetchMyReservations() {
   renderReservations(data);
 }
 
-
-//Render rows
-async function fetchMyReservations() {
-  reservationsBody.innerHTML = "";
-
-  const res = await fetch("http://localhost:3000/reservations/", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`
-    }
-  });
-
-  const data = await res.json();
-
-  data.forEach(r => {
+/* =========================
+   Render Table Rows
+========================= */
+function renderReservations(data) {
+  data.forEach((r) => {
     const tr = document.createElement("tr");
 
-    let actionContent = "";
-
-    if (r.status === "CANCELLED") {
-      actionContent = `<span class="cancelled-text">Cancelled</span>`;
-    } else {
-      actionContent = `
-        <button class="text-cancel-btn" onclick="cancelReservation(${r.id})">
-          Cancel
-        </button>
-      `;
-    }
+    const action =
+      r.status === "CANCELLED"
+        ? `<span class="cancelled-text">Cancelled</span>`
+        : `<button class="text-cancel-btn" onclick="cancelReservation(${r.id})">Cancel</button>`;
 
     tr.innerHTML = `
       <td>${r.date}</td>
       <td>${r.time_slot}</td>
       <td>${r.guests}</td>
       <td>${r.table_number}</td>
-      <td>${actionContent}</td>
+      <td>${action}</td>
     `;
 
     reservationsBody.appendChild(tr);
   });
 }
 
+/* =========================
+   Time Slot Options Generator
+========================= */
+function getTimeSlotOptions(selectedTime) {
+  let options = "";
 
-//Cancel Reservation
+  for (let i = 0; i < 24; i++) {
+    const hour = i.toString().padStart(2, "0") + ":00";
+    options += `
+      <option value="${hour}" ${hour === selectedTime ? "selected" : ""}>
+        ${hour}
+      </option>
+    `;
+  }
+
+  return options;
+}
+timeSlotInput.innerHTML = getTimeSlotOptions();
+
+/* =========================
+   Cancel Reservation (DELETE)
+========================= */
 async function cancelReservation(id) {
-  const confirmCancel = confirm("Are you sure you want to cancel?");
-  if (!confirmCancel) return;
+  if (!confirm("Are you sure you want to cancel?")) return;
 
-  const token = localStorage.getItem("token");
-
-  await fetch(`http://localhost:3000/reservations/${id}`, {
+  await fetch(`${API_BASE}/reservations/${id}`, {
     method: "DELETE",
     headers: {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${getToken()}`
     }
   });
 
-  fetchMyReservations(); // refresh after cancel
+  fetchMyReservations();
 }
 
-fetchMyReservations()
+/* =========================
+   Initial Load
+========================= */
+fetchMyReservations();
